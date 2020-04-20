@@ -5,7 +5,7 @@
 # blacklist_gen: Generate a blacklist of all accounts Zmbackup should ignore
 ################################################################################
 function blacklist_gen(){
-  for ACCOUNT in $(su - $OSE_USER -c "/opt/zimbra/bin/zmprov -l gaa"); do
+  for ACCOUNT in $(su - $OSE_USER -c "zmprov -l gaa"); do
     if  [[ "$ACCOUNT" = "galsync"* ]] || \
     [[ "$ACCOUNT" = "virus"* ]] || \
     [[ "$ACCOUNT" = "ham"* ]] || \
@@ -39,9 +39,9 @@ function deploy_new() {
   if [[ $SESSION_TYPE == "TXT" ]]; then
     touch $OSE_DEFAULT_BKP_DIR/sessions.txt
   elif [[ $SESSION_TYPE == "SQLITE3" ]]; then
-    sqlite3 $OSE_DEFAULT_BKP_DIR/sessions.sqlite3 < project/lib/sqlite3/database.sql > /dev/null 2>&1
+    sqlite3 $OSE_DEFAULT_BKP_DIR/sessions.sqlite3 < src/database/database.sql > /dev/null 2>&1
   fi
-  chown -R $OSE_USER.$OSE_USER $OSE_DEFAULT_BKP_DIR > /dev/null 2>&1
+  chown -R $OSE_USER. $OSE_DEFAULT_BKP_DIR > /dev/null 2>&1
   echo -ne '#                     (5%)\r'
   test -d $ZMBKP_CONF || mkdir -p $ZMBKP_CONF
   echo -ne '##                    (10%)\r'
@@ -53,7 +53,7 @@ function deploy_new() {
 
   # Disable Parallel's message - Zmbackup remind the user about GNU Parallel
   mkdir $OSE_INSTALL_DIR/.parallel > /dev/null 2>&1 && touch $OSE_INSTALL_DIR/.parallel/will-cite
-  chown -R zimbra. $OSE_INSTALL_DIR/.parallel
+  chown -R $OSE_USER. $OSE_INSTALL_DIR/.parallel
 
   # Copy file
   install -o $OSE_USER -m 700 $MYDIR/src/zmbackup $ZMBKP_SRC
@@ -62,9 +62,6 @@ function deploy_new() {
   chown -R $OSE_USER. $ZMBKP_LIB
   chmod -R 700 $ZMBKP_LIB
   echo -ne '######                (30%)\r'
-
-  # Creating httpie config directory
-  mkdir $OSE_INSTALL_DIR/.httpie > /dev/null 2>&1 && chown zimbra. $OSE_INSTALL_DIR/.httpie
 
   install --backup=numbered -o root -m 600 $MYDIR/src/config/zmbackup.cron /etc/cron.d/zmbackup
   echo -ne '#######               (35%)\r'
@@ -98,15 +95,23 @@ function deploy_new() {
   echo -ne '#################     (85%)\r'
 
   # Fix backup dir permissions (owner MUST be $OSE_USER)
-  chown $OSE_USER $OSE_DEFAULT_BKP_DIR
+  chown $OSE_USER. $OSE_DEFAULT_BKP_DIR
   echo -ne '##################    (90%)\r'
 
   # Generate Zmbackup's blacklist
   blacklist_gen
   echo -ne '###################   (95%)\r'
 
+  # Create PID folder
+  mkdir /var/run/zmbackup
+  chown $OSE_USER. /var/run/zmbackup
+
+  # Create log folder
+  mkdir -p /var/log/zmbackup
+  chown $OSE_USER. /var/log/zmbackup
+
   # Creating Zmbackup backup user
-  STATUS=$((su - $OSE_USER -c "/opt/zimbra/bin/zmprov ca '$ZMBKP_ACCOUNT' '$ZMBKP_PASSWORD' zimbraIsAdminAccount TRUE zimbraAdminAuthTokenLifetime 1") 2>&1)
+  STATUS=$((su - $OSE_USER -c "zmprov ca '$ZMBKP_ACCOUNT' '$ZMBKP_PASSWORD' zimbraIsAdminAccount TRUE zimbraAdminAuthTokenLifetime 1") 2>&1)
   if [[ $? -eq 0 ]]; then
       echo -ne '####################  (100%)\r'
   else
@@ -129,10 +134,7 @@ function deploy_upgrade(){
 
   # Disable Parallel's message - Zmbackup remind the user about GNU Parallel
   mkdir $OSE_INSTALL_DIR/.parallel > /dev/null 2>&1 && touch $OSE_INSTALL_DIR/.parallel/will-cite
-  chown -R zimbra. $OSE_INSTALL_DIR/.parallel
-
-  # Creating httpie config directory
-  mkdir $OSE_INSTALL_DIR/.httpie > /dev/null 2>&1 && chown zimbra. $OSE_INSTALL_DIR/.httpie
+  chown -R $OSE_USER. $OSE_INSTALL_DIR/.parallel
 
   # Copy files
   install -o $OSE_USER -m 700 $MYDIR/src/zmbackup $ZMBKP_SRC
@@ -160,7 +162,7 @@ function uninstall() {
   
   # Remove Zmbackup backup user
   echo "Removing zmbackup account..."
-  STATUS=$((su - $OSE_USER -c "/opt/zimbra/bin/zmprov da '$ZMBKP_ACCOUNT'") 2>&1)
+  STATUS=$((su - $OSE_USER -c "zmprov da '$ZMBKP_ACCOUNT'") 2>&1)
 
   echo -ne '##########            (50%)\r'
     if [[ -f $ZMBKP_CONF/blacklist.conf ]]; then
@@ -168,8 +170,11 @@ function uninstall() {
     blacklist_gen
   fi
   echo -ne '###############       (75%)\r'
-  sudo -H -u $OSE_USER bash -c "/opt/zimbra/bin/zmprov da $ZMBKP_ACCOUNT" > /dev/null 2>&1
+
+  # Delete zmbackup admin account
+  sudo -H -u $OSE_USER bash -c "zmprov da $ZMBKP_ACCOUNT" > /dev/null 2>&1
   echo -ne '####################  (100%)\r'
+
   printf "Preserve Backup Storage?[n/Y]"
   read OPT
   if [[ $OPT == 'N' && $OPT == 'n' ]]; then

@@ -26,13 +26,13 @@ trap on_exit TERM INT EXIT
 # create_temp: Create the temporary files used by the script.
 ################################################################################
 function create_temp(){
-  export readonly TEMPDIR=$(mktemp -d $WORKDIR/XXXX)
-  export readonly TEMPACCOUNT=$(mktemp)
-  export readonly TEMPINACCOUNT=$(mktemp)
-  export readonly MESSAGE=$(mktemp)
-  export readonly FAILURE=$(mktemp)
-  export readonly TEMPSESSION=$(mktemp)
-  export readonly TEMPSQL=$(mktemp)
+  readonly TEMPDIR=$(mktemp -d $WORKDIR/XXXX)
+  readonly TEMPACCOUNT=$(mktemp)
+  readonly TEMPINACCOUNT=$(mktemp)
+  readonly MESSAGE=$(mktemp)
+  readonly FAILURE=$(mktemp)
+  readonly TEMPSESSION=$(mktemp)
+  readonly TEMPSQL=$(mktemp)
 }
 
 ################################################################################
@@ -61,30 +61,30 @@ function load_config(){
 function constant(){
   # LDAP OBJECT
   if [ "$BACKUP_INACTIVE_ACCOUNTS" == "true" ]; then
-    export readonly ACOBJECT="(objectclass=zimbraAccount)"
+    readonly ACOBJECT="(objectclass=zimbraAccount)"
   else
-    export readonly ACOBJECT="(&(objectclass=zimbraAccount)(zimbraAccountStatus=active))"
+    readonly ACOBJECT="(&(objectclass=zimbraAccount)(zimbraAccountStatus=active))"
   fi
 
   # Enabling SSL for ZMBACKUP
    if [ "$SSL_ENABLE" == "true" ]; then
-     export readonly WEBPROTO="https"
+     readonly WEBPROTO="https"
    else
-     export readonly WEBPROTO="http"
+     readonly WEBPROTO="http"
    fi
 
-  export readonly DLOBJECT="(objectclass=zimbraDistributionList)"
-  export readonly ALOBJECT="(objectclass=zimbraAlias)"
-  export readonly SIOBJECT="(objectclass=zimbraSignature)"
+  readonly DLOBJECT="(objectclass=zimbraDistributionList)"
+  readonly ALOBJECT="(objectclass=zimbraAlias)"
+  readonly SIOBJECT="(objectclass=zimbraSignature)"
 
   # LDAP FILTER
-  export readonly DLFILTER="mail"
-  export readonly ACFILTER="zimbraMailDeliveryAddress"
-  export readonly ALFILTER="uid"
-  export readonly SIFILTER="zimbraSignatureName"
+  readonly DLFILTER="mail"
+  readonly ACFILTER="zimbraMailDeliveryAddress"
+  readonly ALFILTER="uid"
+  readonly SIFILTER="zimbraSignatureName"
 
   # PID FILE
-  export readonly PID='/opt/zimbra/log/zmbackup.pid'
+  readonly PID='/var/run/zmbackup/zmbackup.pid'
 }
 
 ################################################################################
@@ -95,34 +95,21 @@ function constant(){
 ################################################################################
 function sessionvars(){
   ls $WORKDIR/full* > /dev/null 2>&1
-  if [[ $? -ne 0 || $1 == '--full' || $1 == '-f' ]]; then
-    export readonly STYPE="Full Account"
-    export readonly SESSION="full-"$(date  +%Y%m%d%H%M%S)
-    export readonly INC='FALSE'
-  elif [[ $1 == '--incremental' || $1 == '-i' ]]; then
-    export readonly STYPE="Incremental Account"
-    export readonly SESSION="inc-"$(date  +%Y%m%d%H%M%S)
-    export readonly INC='TRUE'
-  elif [[ $1 == '--alias' || $1 == '-al' ]]; then
-    export readonly STYPE="Alias"
-    export readonly SESSION="alias-"$(date  +%Y%m%d%H%M%S)
-    export readonly INC='FALSE'
+  if [[ $? -ne 0 || $1 == '-f' || $1 == '--full' ]]; then
+    readonly STYPE="Full Account"
+    readonly SESSION="full-"$(date  +%Y%m%d%H%M%S)
+  elif [[ $1 == '-al' || $1 == '--alias' ]]; then
+    readonly STYPE="Alias"
+    readonly SESSION="alias-"$(date  +%Y%m%d%H%M%S)
   elif [[ $1 == '-dl' || $1 == '--distributionlist' ]]; then
-    export readonly STYPE="Distribution List"
-    export readonly SESSION="distlist-"$(date  +%Y%m%d%H%M%S)
-    export readonly INC='FALSE'
-  elif [[ $1 == '-m' || $1 == '--mail' ]]; then
-    export readonly STYPE="Mailbox"
-    export readonly SESSION="mbox-"$(date  +%Y%m%d%H%M%S)
-    export readonly INC='FALSE'
-  elif [[ $1 == '--ldap' || $1 == '-ldp' ]]; then
-    export readonly STYPE="Account - Only LDAP"
-    export readonly SESSION="ldap-"$(date  +%Y%m%d%H%M%S)
-    export readonly INC='FALSE'
-  elif [[ $1 == '--signature' || $1 == '-sig' ]]; then
-    export readonly STYPE="Signature"
-    export readonly SESSION="signature-"$(date  +%Y%m%d%H%M%S)
-    export readonly INC='FALSE'
+    readonly STYPE="Distribution List"
+    readonly SESSION="distlist-"$(date  +%Y%m%d%H%M%S)
+  elif [[ $1 == '-l' || $1 == '--ldap' ]]; then
+    readonly STYPE="Account - Only LDAP"
+    readonly SESSION="ldap-"$(date  +%Y%m%d%H%M%S)
+  elif [[ $1 == '-m' || $1 == '--mailbox' ]]; then
+    readonly STYPE="Mailbox"
+    readonly SESSION="mailbox-"$(date  +%Y%m%d%H%M%S)
   fi
 }
 
@@ -145,8 +132,8 @@ function validate_config(){
   fi
 
   if [ -z "$WORKDIR" ]; then
-    WORKDIR="/opt/zimbra/backup"
-    logger -i -p local7.warn "Zmbackup: WORKDIR not informed - setting as /opt/zimbra/backup/ instead."
+    WORKDIR="/backup"
+    logger -i -p local7.warn "Zmbackup: WORKDIR not informed - setting as /backup/ instead."
   fi
 
   if [ -z "$MAILHOST" ]; then
@@ -255,7 +242,7 @@ function checkpid(){
     PIDP=`cat $PID`
     PIDR=`ps -efa | awk '{print $2}' | grep -c "^$PIDP$"`
     if [ $PIDR -gt 0 ]; then
-      echo "FATAL: could not write lock file '/opt/zimbra/log/zmbackup.pid': File already exist"
+      echo "FATAL: could not write lock file '/var/run/zmbackup/zmbackup.pid': File already exist"
       echo "This file exist as a secure measurement to protect your system to run two zmbackup"
       echo "instances at the same time."
       exit 4

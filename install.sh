@@ -40,10 +40,10 @@ if [[ $1 == "--remove" ]] || [[ $1 == "-r" ]]; then
   if [[ $UNINSTALL = "Y" ]]; then
     if [[ $SO = "ubuntu" ]]; then
       echo "Disabled Package Uninstall"
-      # remove_ubuntu
+      # uninstall_ubuntu
     else
       echo "Disabled Package Uninstall"
-      # remove_redhat
+      # uninstall_redhat
     fi
     uninstall
     echo "Uninstall completed. Thanks for using Zmbackup. Have a nice day!"

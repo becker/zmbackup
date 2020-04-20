@@ -9,14 +9,12 @@ function contract(){
   echo "##################################################################################"
   echo "#                                                                                #"
   cat << "EOF"
-#  M""""""""`M            dP                         dP                          #
-#  Mmmmmm   .M            88                         88                          #
-#  MMMMP  .MMM 88d8b.d8b. 88d888b. .d8888b. .d8888b. 88  .dP  dP    dP 88d888b.  #
-#  MMP  .MMMMM 88'`88'`88 88'  `88 88'  `88 88'  `"" 88888"   88    88 88'  `88  #
-#  M' .MMMMMMM 88  88  88 88.  .88 88.  .88 88.  ... 88  `8b. 88.  .88 88.  .88  #
-#  M         M dP  dP  dP 88Y8888' `88888P8 `88888P' dP   `YP `88888P' 88Y888P'  #
-#  MMMMMMMMMMM                                                         88        #
-#                                                                      dP        #
+#   _____          _                _                  #
+#  |__  /_ __ ___ | |__   __ _  ___| | ___   _ _ __    #
+#    / /| '_ ` _ \| '_ \ / _` |/ __| |/ / | | | '_ \   #
+#   / /_| | | | | | |_) | (_| | (__|   <| |_| | |_) |  #
+#  /____|_| |_| |_|_.__/ \__,_|\___|_|\_\\__,_| .__/   #
+#                                             |_|      #
 EOF
   echo "#                                                                                #"
   echo "##################################################################################"
@@ -88,31 +86,31 @@ function set_values() {
   read TMP
   ZMBKP_MAIL_ALERT=${TMP:-$ZMBKP_MAIL_ALERT}
 
-  # Configure mail alert
+  # Configure number of threads to run in parallel
   printf "\nInform Zmbackup's number of threads - DEFAULT [$MAX_PARALLEL_PROCESS]:"
   read TMP
   MAX_PARALLEL_PROCESS=${TMP:-$MAX_PARALLEL_PROCESS}
 
-  # Configure mail alert
+  # Configure backup folder
   printf "\nInform the number of days Zmbackup should store the backups - DEFAULT [$ROTATE_TIME]:"
   read TMP
   ROTATE_TIME=${TMP:-$ROTATE_TIME}
 
-  # Configure mail alert
-  printf "\nZmbackup should limit backups for one per day? - DEFAULT [$LOCK_BACKUP]:"
+  # Configure if should lock backup
+  printf "\nLimit to one backup per day? - DEFAULT [$LOCK_BACKUP]:"
   read TMP
   LOCK_BACKUP=${TMP:-$LOCK_BACKUP}
 
   # Configure mail alert
   while ! [[ "$TMP" == 'SQLITE3' || "$TMP" == 'TXT' ]]; do
-      printf "\nWhere you want to store Zmbackup's sessions? TXT or SQLITE3 - DEFAULT [$SESSION_TYPE]:"
+      printf "\nHow do you want to store Zmbackup's sessions? TXT or SQLITE3 - DEFAULT [$SESSION_TYPE]:"
       read TMP
       TMP=${TMP:-$SESSION_TYPE}
   done
   SESSION_TYPE=${TMP:-$SESSION_TYPE}
 
   # Change Zmbackup password
-  printf "\nInform a password for zmbackup user - DEFAULT [$ZMBKP_PASSWORD]:"
+  printf "\nInform a password for Zmbackup user - DEFAULT [$ZMBKP_PASSWORD]:"
   read TMP
   TMP=${TMP:-$ZMBKP_PASSWORD}
 

@@ -64,11 +64,11 @@ function install_redhat() {
 }
 
 ################################################################################
-# remove_ubuntu: Remove all the dependencies in Ubuntu Server
+# uninstall_ubuntu: Remove all the dependencies in Ubuntu Server
 ################################################################################
-function remove_ubuntu() {
+function uninstall_ubuntu() {
   echo "Removing dependencies. Please wait..."
-  apt-get --purge remove -y parallel wget httpie > /dev/null 2>&1
+  apt-get --purge remove -y parallel wget curl > /dev/null 2>&1
   if [[ $? -eq 0 ]]; then
     echo "Dependencies removed with success!"
   else
@@ -76,20 +76,19 @@ function remove_ubuntu() {
     echo "Please check if you have connection with the internet and apt-get is"
     echo "working and try again."
     echo "Or you can try manual execute the command:"
-    echo "apt-get remove -y parallel wget httpie"
+    echo "apt-get remove -y parallel wget curl"
   fi
 }
 
 ################################################################################
-# remove_redhat: Install all the dependencies in Red Hat and CentOS
+# uninstall_redhat: Install all the dependencies in Red Hat and CentOS
 ################################################################################
-function remove_redhat() {
+function uninstall_redhat() {
   echo "Removing dependencies. Please wait..."
-  cat /etc/redhat-release | grep 6 > /dev/null 2>&1
-  if [[ $? -eq 0 ]]; then
-    pip uninstall -y httpie > /dev/null 2>&1
-  fi
-  yum remove -y parallel wget httpie python-pip > /dev/null 2>&1
+  yum remove -y parallel > /dev/null 2>&1
+  # Remove parallel's repo
+  rm -f /etc/yum.repos.d/tange.repo
+
   if [[ $? -eq 0 ]]; then
     echo "Dependencies removed with success!"
   else
@@ -97,6 +96,6 @@ function remove_redhat() {
     echo "Please check if you have connection with the internet and yum is"
     echo "working and try again."
     echo "Or you can try manual execute the command:"
-    echo "yum install -y epel-release && yum install -y parallel wget httpie"
+    echo "yum install -y epel-release && yum install -y parallel wget curl"
   fi
 }

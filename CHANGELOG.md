@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2020-04-20
 ### Added
 - CHANGELOG.md file.
+- ZMBACKUP_METHOD option, supporting wget, cURL and zimbra.
 
 ### Changed
 - Renamed folder "installScript" to "install".
@@ -14,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renamed file "depDownload.sh" to "dependencies.sh".
 - Renamed column "sessionID" to "id" in backup_session table.
 - Renamed column "sessionID" to "session_id" in backup_account table.
+- Changed PID folder to "/var/run/zmbackup".
+- HTTPie changed to cURL.
+- Minor code changes.
 
 ### Removed
 - Incremental backup options.

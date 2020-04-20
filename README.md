@@ -1,12 +1,12 @@
 Zmbackup - Backup Script for Zimbra OSE
 =========
 
-Zmbackup is a reliable Bash shell script developed to help you in your daily task to backup and restore mails and accounts from Zimbra Open Source Email Platform. This script is based on another project called [Zmbkpose](https://github.com/bggo/Zmbkpose), and completely compatible with the structure if you have plans on migrate from one to another.
+Zmbackup is a reliable Bash shell script developed to help you in your daily task to backup and restore mails and accounts from Zimbra Open Source Email Platform. This script is based on another project called [Zmbackup](https://github.com/zmbackup/zmbackup).
 
 [![Zimbra Version](https://img.shields.io/badge/Zimbra%20OSE-8.8.8-orange.svg)](https://www.zimbra.com/downloads/zimbra-collaboration-open-source/)
 ![Linux Distro](https://img.shields.io/badge/platform-CentOS%20%7C%20Red%20Hat%20%7C%20Ubuntu-blue.svg)
 ![Branch](https://img.shields.io/badge/Branch-Unstable-red.svg)
-![Release](https://img.shields.io/badge/Release-1.2.3-green.svg)
+![Release](https://img.shields.io/badge/Release-2.0.0-green.svg)
 
 Features
 ------------
@@ -14,7 +14,7 @@ Features
 * Backup routines for one, many, or all mailbox, accounts, alias and distribution lists;
 * Restore the routines in your respective places, or inside another account using Restore on Account;
 * Multithreading - Execute each rotine quickly as possible;
-* Have some insights about eacho backup routine;
+* Have some insights about each backup routine;
 * Receive alert everytime a backup session begins;
 * Better internal garbage manager;
 * Filter the accounts that should not be execute with blacklists;
@@ -26,7 +26,6 @@ Requirements
 
 * **GNU Wget** - a computer program that retrieves content from web servers;
 * **GNU Parallel** - a shell tool for executing jobs in parallel using one or more CPU;
-* **HTTPie** - a command line HTTP client with an intuitive UI, JSON support, syntax highlighting, wget-like downloads, plugins, and more.
 * **GNU grep** - a command-line utility for searching plain-text data sets for lines matching a regular expression;
 * **date** - command used to print out, or change the value of, the system's time and date information;
 * **cron** - a time-based job scheduler in Unix-like computer operating systems;
@@ -51,10 +50,10 @@ Now, install the packages **parallel**, **wget**, **sqlite3** and **httpie** in 
 # yum install parallel wget httpie sqlite3
 ```
 
-Download the latest package with the BETA tag in "Release" section, or git clone the development branch:
+Download the latest package, or git clone the development branch:
 
 ```
-git clone -b 1.2-version https://github.com/lucascbeyeler/zmbackup.git
+git clone -b 2.0.0 https://github.com/becker/zmbackup.git
 ```
 
 Inside the project folder, execute the script **install.sh** and follow all the instructions to install the project. To validate if the script is installed, change to your server's zimbra user and execute zmbackup -v.
@@ -64,7 +63,7 @@ Inside the project folder, execute the script **install.sh** and follow all the 
 # ./install.sh
 # su - zimbra
 $ zmbackup -v
-  zmbackup version: 1.2.3
+  zmbackup version: 2.0.0
 ```
 
 Usage
@@ -188,19 +187,6 @@ Scheduling backups
 
 The installer script automatically creates a cron config file in `/etc/cron.d/zmbackup`. You can customize backup routines editing that file.
 
-Get Involved
-------------------
-* You can participate in our [Google Group](https://groups.google.com/forum/#!forum/zmbackup) - you are free to post anything there, but please follow the Guidelines! This group will be used to discuss new features planed to be created in the future, answer any question about how to use the software, discuss about the latest release, and so on.
-* You can send e-mail to zmbackup@protonmail.com if you need to discuss something direct to the developers. We will answer you as quickly as possible, but try to keep your questions in the Google Group - this way more and more peoples can be benefited with the answer.
-
-Want to contribute to the project?
-------------------
-* **We are looking for Beta Testers to use the latest release of Zmbackup at this moment.** Want to help? Install a Zimbra server in your note, create some accounts and keep using Zmbackup. Any problem you find can be reported in Issues and our Google Group, and will be fixed in the next release.
-
-  * **Valid version:** 1.2.X
-
-
-* **We are looking for peoples to correct and keep up to date the documentation:** At this moment the documentation is only this README.md file, but I have plans to expand to a real documentation using Read the Docs. Do you have time and want to write? You can fork this project and start right now! Remember to document only 1.2.2 content there!
 
 License
 -------
@@ -211,5 +197,5 @@ View official GNU site <http://www.gnu.org/licenses/gpl.html>.
 
 Author Information
 ------------------
-
-* [Lucas Costa Beyeler](https://github.com/lucascbeyeler) - lucas.costab@outlook.com
+* [Vinicius Becker](https://github/becker) - vinicius@becker.eti.br
+* [Lucas Costa Beyeler](https://github.com/lucascbeyeler) - lucas.costab@outlook.com (original project [zmbackup/zmbackup](https://github.com/zmbackup/zmbackup))
