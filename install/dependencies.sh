@@ -7,7 +7,7 @@
 function install_ubuntu() {
   echo "Installing dependencies. Please wait..."
   apt-get update > /dev/null 2>&1
-  apt-get install -y parallel wget httpie > /dev/null 2>&1
+  apt-get install -y parallel wget curl > /dev/null 2>&1
   if [[ $? -eq 0 ]]; then
     echo "Dependencies installed with success!"
   else
@@ -15,8 +15,8 @@ function install_ubuntu() {
     echo "Please check if you have connection with the internet and apt-get is"
     echo "working and try again."
     echo "Or you can try manual execute the command:"
-    echo "apt-get update && apt-get install -y parallel wget httpie"
-    exit $ERR_DEPNOTFOUND
+    echo "apt-get update && apt-get install -y parallel wget curl"
+    exit $EXIT_DEPNOTFOUND
   fi
 }
 
@@ -28,28 +28,29 @@ function install_redhat() {
   yum install wget -y > /dev/null 2>&1
   if [[ $? -ne 0 ]]; then
     echo "Failure - Can't install Wget"
-    exit $ERR_NO_CONNECTION
+    exit $EXIT_NO_CONNECTION
   fi
-  cat /etc/redhat-release | grep 6 > /dev/null 2>&1
+  cat /etc/redhat-release | grep "release 6." > /dev/null 2>&1
   if [[ $? -eq 0 ]]; then
-    wget -O "/etc/yum.repos.d/tange.repo" $OLE_TANGE > /dev/null 2>&1
+    wget -O "/etc/yum.repos.d/tange.repo" $OLE6_TANGE > /dev/null 2>&1
+
     if [[ $? -ne 0 ]]; then
       echo "Failure - Can't install Tange's repository for Parallel"
-      exit $ERR_NO_CONNECTION
+      exit 1
     fi
-    yum install -y python-pip -y  > /dev/null 2>&1
-    if [[ $? -ne 0 ]]; then
-      echo "Failure - Can't install python-pip to download and install httpie"
-      exit $ERR_NO_CONNECTION
-    fi
-    pip install httpie  > /dev/null 2>&1
-    if [[ $? -ne 0 ]]; then
-      echo "Failure - Can't install httpie"
-      exit $ERR_NO_CONNECTION
+  else
+    cat /etc/redhat-release | grep "release 7." > /dev/null 2>&1
+    if [[ $? -eq 0 ]]; then
+        wget -O "/etc/yum.repos.d/tange.repo" $OLE7_TANGE > /dev/null 2>&1
+
+        if [[ $? -ne 0 ]]; then
+            echo "Failure - Can't install Tange's repository for Parallel"
+            exit 1
+        fi
     fi
   fi
   yum install -y epel-release  > /dev/null 2>&1
-  yum install -y parallel httpie  > /dev/null 2>&1
+  yum install -y parallel curl  > /dev/null 2>&1
   if [[ $? -eq 0 ]]; then
     echo "Dependencies installed with success!"
   else
@@ -57,8 +58,8 @@ function install_redhat() {
     echo "Please check if you have connection with the internet and yum is"
     echo "working and try again."
     echo "Or you can try manual execute the command:"
-    echo "yum install -y epel-release && yum install -y parallel wget httpie"
-    exit $ERR_DEPNOTFOUND
+    echo "yum install -y epel-release && yum install -y parallel wget curl"
+    exit $EXIT_DEPNOTFOUND
   fi
 }
 

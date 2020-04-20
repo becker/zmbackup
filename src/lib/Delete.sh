@@ -12,7 +12,7 @@ function delete_one(){
   if [[ $SESSION_TYPE == 'TXT' ]]; then
     SESSION=$(grep "$1 started" $WORKDIR/sessions.txt -m 1 | awk '{print $2}')
   elif [[ $SESSION_TYPE == 'SQLITE3' ]]; then
-    SESSION=$(sqlite3 $WORKDIR/sessions.sqlite3 "select sessionID from backup_session where sessionID='$1'")
+    SESSION=$(sqlite3 $WORKDIR/sessions.sqlite3 "select id from backup_session where id='$1'")
   fi
   if [ ! -z "$SESSION" ]; then
     echo "Removing session $1 - please wait."
@@ -38,7 +38,7 @@ function delete_old(){
       fi
     done
   elif [[ $SESSION_TYPE == 'SQLITE3' ]]; then
-    sqlite3 $WORKDIR/sessions.sqlite3 "select sessionID from backup_session where conclusion_date < datetime('now','-$ROTATE_TIME day')" | while read LINE; do
+    sqlite3 $WORKDIR/sessions.sqlite3 "select id from backup_session where conclusion_date < datetime('now','-$ROTATE_TIME day')" | while read LINE; do
       __DELETEBACKUP $LINE
     done
     sqlite3 $WORKDIR/sessions.sqlite3 "VACUUM"
@@ -57,7 +57,7 @@ function leeroy_jenkins(){
       __DELETEBACKUP $LINE
     done
   elif [[ $SESSION_TYPE == 'SQLITE3' ]]; then
-    sqlite3 $WORKDIR/sessions.sqlite3 "select sessionID from backup_session" | while read LINE; do
+    sqlite3 $WORKDIR/sessions.sqlite3 "select id from backup_session" | while read LINE; do
       __DELETEBACKUP $LINE
     done
     sqlite3 $WORKDIR/sessions.sqlite3 "VACUUM"
@@ -79,8 +79,8 @@ function __DELETEBACKUP(){
       cat $WORKDIR/.sessions.txt > $WORKDIR/sessions.txt
       rm -rf $WORKDIR/.sessions.txt
     elif [[ $SESSION_TYPE == 'SQLITE3' ]]; then
-      sqlite3 $WORKDIR/sessions.sqlite3 "delete from backup_account where sessionID='$1'"
-      sqlite3 $WORKDIR/sessions.sqlite3 "delete from backup_session where sessionID='$1'"
+      sqlite3 $WORKDIR/sessions.sqlite3 "delete from backup_account where session_id='$1'"
+      sqlite3 $WORKDIR/sessions.sqlite3 "delete from backup_session where id='$1'"
     fi
     echo "Backup session $1 removed."
     logger -i -p local7.info "Zmbhousekeep: Backup session $1 removed."

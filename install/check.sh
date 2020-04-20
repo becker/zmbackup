@@ -9,7 +9,7 @@ function check_env() {
   if [ $(id -u) -ne 0 ]; then
     printf "[NO ROOT]\n"
   	echo "You need root privileges to install zmbackup"
-  	exit $ERR_NOROOT
+  	exit $EXIT_NOROOT
   else
     printf "[ROOT]\n"
   fi

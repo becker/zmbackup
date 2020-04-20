@@ -40,6 +40,11 @@
 #                               <lucas.costab@outlook.com>
 #                               <zmbackup@protonmail.com>
 ################################################################################
+# zmbackup:
+#
+# 17/04/2020 - Version 2.0.0  - By Vinicius Becker
+#                               <vinicius@becker.eti.br>
+################################################################################
 # parallel:
 #
 #   O. Tange (2011): GNU Parallel - The Command-Line Power Tool,
@@ -48,20 +53,22 @@
 ################################################################################
 # LOADING ZMBACKUP LIBRARIES
 ################################################################################
-source /usr/local/lib/zmbackup/bash/HelpAction.sh
-source /usr/local/lib/zmbackup/bash/MiscAction.sh
-source /usr/local/lib/zmbackup/bash/NotifyAction.sh
-source /usr/local/lib/zmbackup/bash/ParallelAction.sh
-source /usr/local/lib/zmbackup/bash/ListAction.sh
-source /usr/local/lib/zmbackup/bash/BackupAction.sh
-source /usr/local/lib/zmbackup/bash/RestoreAction.sh
-source /usr/local/lib/zmbackup/bash/DeleteAction.sh
-source /usr/local/lib/zmbackup/bash/MigrationAction.sh
-source /usr/local/lib/zmbackup/bash/SessionAction.sh
+source /opt/zmbackup/lib/Help.sh
+source /opt/zmbackup/lib/Misc.sh
+source /opt/zmbackup/lib/Notify.sh
+source /opt/zmbackup/lib/Parallel.sh
+source /opt/zmbackup/lib/List.sh
+source /opt/zmbackup/lib/Backup.sh
+source /opt/zmbackup/lib/Restore.sh
+source /opt/zmbackup/lib/Delete.sh
+source /opt/zmbackup/lib/Migration.sh
+source /opt/zmbackup/lib/Session.sh
 
 ################################################################################
 # ZMBACKUP MAIN CODE
 ################################################################################
+VERSION="2.0.0"
+
 load_config
 validate_config
 export_function
@@ -83,13 +90,13 @@ case "$1" in
         backup_main $ALOBJECT $ALFILTER $3 $4
         rm -rf $PID
       ;;
-      "-ldp"|"--ldap" )
+      "-l"|"--ldap" )
         sessionvars $2
         create_temp
         backup_main $ACOBJECT $ACFILTER $3 $4
         rm -rf $PID
       ;;
-      "-m"|"--mail" )
+      "-m"|"--mailbox" )
         sessionvars $2
         create_temp
         backup_main $ACOBJECT $ACFILTER $3 $4
@@ -109,13 +116,6 @@ case "$1" in
       ;;
     esac
   ;;
-  "-i"|"--incremental" )
-    sessionvars $1 'TRUE'
-    checkpid
-    create_temp
-    backup_main $ACOBJECT $ACFILTER $2 $3
-    rm -rf $PID
-  ;;
   "-l"|"--list" )
     list_sessions
   ;;
@@ -123,11 +123,11 @@ case "$1" in
     create_temp
     checkpid
     case "$2" in
-      "-dl"|"--distributionlist"|"-ldp"|"--ldap"|"-al"|"--alias"|"-sig"|"--signature")
+      "-dl"|"--distributionlist"|"-l"|"--ldap"|"-al"|"--alias"|"-sig"|"--signature")
         restore_main_ldap $3 $4 $5
         rm -rf $PID
       ;;
-      "-m"|"--mail" )
+      "-m"|"--mailbox" )
         restore_main_mailbox $3 $4 $5
         rm -rf $PID
       ;;
@@ -143,7 +143,7 @@ case "$1" in
         fi
       ;;
       * )
-        if [[ "$2" == "full"* || "$2" == "inc"* ]]; then
+        if [[ "$2" == "full"* ]]; then
           constant
           restore_main_ldap $2 $3 $4
           restore_main_mailbox $2 $3 $4
@@ -165,7 +165,7 @@ case "$1" in
       rm -rf $PID
     fi
   ;;
-  "-hp"|"--housekeep")
+  "--housekeep")
     checkpid
     delete_old
     clean_empty
@@ -185,7 +185,7 @@ case "$1" in
     show_help
   ;;
   "-v"|"--version" )
-    echo "zmbackup version: 1.2.3"
+    echo "zmbackup version: $VERSION"
   ;;
   "-m"|"--migrate" )
     checkpid

@@ -71,11 +71,11 @@ function importsessionSQL(){
 ###############################################################################
 function importaccountsSQL(){
   for i in $(egrep 'SESSION:' $WORKDIR/sessions.txt | egrep 'started' |  awk '{print $2}' | sort | uniq); do
-    DATE=$(sqlite3 $WORKDIR/sessions.sqlite3 "select conclusion_date from backup_session where sessionID='$i'")
+    DATE=$(sqlite3 $WORKDIR/sessions.sqlite3 "select conclusion_date from backup_session where id='$i'")
     for j in $(egrep $i $WORKDIR/sessions.txt | grep -v 'SESSION:' | sort | uniq); do
       EMAIL=$(echo $j | cut -d":" -f2)
       SIZE=$(du -ch $WORKDIR/$i/$EMAIL* | grep total | awk {'print $1'})
-      sqlite3 $WORKDIR/sessions.sqlite3 "insert into backup_account (email,sessionID,\
+      sqlite3 $WORKDIR/sessions.sqlite3 "insert into backup_account (email,session_id,\
                                          account_size,initial_date, conclusion_date) \
                                          values ('$EMAIL','$i','$SIZE','$DATE','$DATE')" > /dev/null
     done
@@ -86,14 +86,14 @@ function importaccountsSQL(){
 # importaccountsTXT: Migrate the accounts from the txt file to the sqlite3 database
 ###############################################################################
 function importsessionTXT(){
-  sqlite3 $WORKDIR/sessions.sqlite3 "select sessionID,conclusion_date from backup_session" | while read SESSION; do
+  sqlite3 $WORKDIR/sessions.sqlite3 "select id,conclusion_date from backup_session" | while read SESSION; do
     MONTH=$(echo $i | cut -d'|' -f2 | cut -d'-' -f2)
     DAY=$(echo $i | cut -d'|' -f2 | cut -d'-' -f3 | cut -d'T' -f1)
     YEAR=$(echo $i | cut -d'|' -f2 | cut -d'-' -f1)
     HOUR=$(echo $i | cut -d'|' -f2 | cut -d'-' -f3 | cut -d'T' -f2)
     MINUTE=$(echo $i | cut -d'|' -f2 | cut -d'-' -f3 | cut -d':' -f2)
     echo "SESSION: $SESSION started on $(date -d '$MONTH/$DAY/$YEAR $HOUR:$MINUTE')" >> $WORKDIR/sessions.txt
-    sqlite3 $WORKDIR/sessions.sqlite3 "select email from backup_account where sessionID='$SESSION'" | while read SESSION; do
+    sqlite3 $WORKDIR/sessions.sqlite3 "select email from backup_account where session_id='$SESSION'" | while read SESSION; do
       echo "$SESSION:$ACCOUNT:$MONTH/$DAY/$YEAR" >> $WORKDIR/sessions.txt
     done
   done

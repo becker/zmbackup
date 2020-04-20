@@ -41,7 +41,7 @@ function mailbox_backup()
     elif [[ $SESSION_TYPE == 'SQLITE3' ]]; then
       DATE=$(sqlite3 $WORKDIR/sessions.sqlite3 "select MAX(initial_date) \
              from backup_account where email='$1' and \
-             (sessionID like 'full%' or sessionID like 'inc%' or sessionID like 'mbox%')")
+             (session_id like 'full%' or session_id like 'inc%' or session_id like 'mbox%')")
     fi
     AFTER='&'"start="$(date -d $DATE +%s)"000"
   fi

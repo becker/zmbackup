@@ -4,12 +4,12 @@
 ################################################################################
 
 # Exit codes
-ERR_OK="0"  		         # No error (normal exit)
-ERR_NOBKPDIR="1"  	     # No backup directory could be found
-ERR_NOROOT="2"  		     # Running without root privileges
-ERR_DEPNOTFOUND="3"  	   # Missing dependency
-ERR_NO_CONNECTION="4"    # Missing connection to install packages
-ERR_CREATE_USER="5"      # Can't create the user for some reason
+EXIT_OK="0"  		         # No error (normal exit)
+EXIT_NOBKPDIR="1"  	     # No backup directory could be found
+EXIT_NOROOT="2"  		     # Running without root privileges
+EXIT_DEPNOTFOUND="3"  	   # Missing dependency
+EXIT_NO_CONNECTION="4"    # Missing connection to install packages
+EXIT_CREATE_USER="5"      # Can't create the user for some reason
 
 # ZMBACKUP INSTALLATION PATH
 MYDIR=`dirname $0`                       # The directory where the install script is
@@ -37,7 +37,8 @@ ZMBKP_VERSION="zmbackup version: 1.2.3"                                         
 SESSION_TYPE="TXT"                                                                                                                             # Zmbackup's default session type
 
 # REPOSITORIES FOR PACKAGES
-OLE_TANGE="http://download.opensuse.org/repositories/home:/tange/CentOS_CentOS-6/home:tange.repo"
+OLE6_TANGE="http://download.opensuse.org/repositories/home:/tange/CentOS_CentOS-6/home:tange.repo"
+OLE7_TANGE="http://download.opensuse.org/repositories/home:/tange/CentOS_7/home:tange.repo"
 
 # Force a terminal type - Issue #90
 export TERM="linux"

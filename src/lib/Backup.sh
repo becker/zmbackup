@@ -21,7 +21,7 @@ function __backupFullInc(){
       elif [[ $SESSION_TYPE == "SQLITE3" ]]; then
         EDATE=$(date +%Y-%m-%dT%H:%M:%S.%N)
         SIZE=$(du -ch $TEMPDIR/$1* | grep total | cut -f1)
-        echo "insert into backup_account (email,sessionID,account_size, initial_date, \
+        echo "insert into backup_account (email,session_id,account_size, initial_date, \
               conclusion_date) values ('$1','$SESSION','$SIZE','$SDATE','$EDATE');"  >> $TEMPSQL
       fi
     fi
@@ -47,7 +47,7 @@ function __backupLdap(){
     elif [[ $SESSION_TYPE == "SQLITE3" ]]; then
       EDATE=$(date +%Y-%m-%dT%H:%M:%S.%N)
       SIZE=$(du -ch $TEMPDIR/$1* | grep total | cut -f1)
-      echo "insert into backup_account (email,sessionID,account_size, initial_date, \
+      echo "insert into backup_account (email,session_id,account_size, initial_date, \
             conclusion_date) values ('$1','$SESSION','$SIZE','$SDATE','$EDATE');"  >> $TEMPSQL
     fi
   fi
@@ -69,7 +69,7 @@ function __backupMailbox(){
     elif [[ $SESSION_TYPE == "SQLITE3" ]]; then
       EDATE=$(date +%Y-%m-%dT%H:%M:%S.%N)
       SIZE=$(du -ch $TEMPDIR/$1* | grep total | cut -f1)
-      echo "insert into backup_account (email,sessionID,account_size, initial_date, \
+      echo "insert into backup_account (email,session_id,account_size, initial_date, \
             conclusion_date) values ('$1','$SESSION','$SIZE','$SDATE','$EDATE');"  >> $TEMPSQL
     fi
   fi
@@ -115,7 +115,7 @@ function backup_main()
       echo "SESSION: $SESSION started on $(date)" >> $TEMPSESSION
     elif [[ $SESSION_TYPE == "SQLITE3" ]]; then
       DATE=$(date +%Y-%m-%dT%H:%M:%S.%N)
-      sqlite3 $WORKDIR/sessions.sqlite3 "insert into backup_session(sessionID,\
+      sqlite3 $WORKDIR/sessions.sqlite3 "insert into backup_session(id,\
                                          initial_date,type,status) values \
                                          ('$SESSION','$DATE','$STYPE','IN PROGRESS')" > /dev/null 2>&1
     fi
@@ -140,7 +140,7 @@ function backup_main()
       sqlite3 $WORKDIR/sessions.sqlite3 < $TEMPSQL > /dev/null 2>&1
       sqlite3 $WORKDIR/sessions.sqlite3 "update backup_session set conclusion_date='$DATE',\
                                          size='$SIZE',status='FINISHED' where \
-                                         sessionID='$SESSION'" > /dev/null 2>&1
+                                         id='$SESSION'" > /dev/null 2>&1
     fi
     logger -i -p local7.info "Zmbackup: Backup session $SESSION finished on $(date)"
     echo "Backup session $SESSION finished on $(date)"

@@ -1,5 +1,5 @@
-  create table backup_session(
-    sessionID varchar primary key,
+  create table backup_session (
+    id varchar primary key,
     initial_date timestamp not null,
     conclusion_date timestamp,
     size varchar,
@@ -7,12 +7,12 @@
     status varchar not null
   );
 
-  create table backup_account(
+  create table backup_account (
     id integer primary key autoincrement,
-    sessionID varchar not null,
+    session_id varchar not null,
     account_size varchar not null,
     email varchar not null,
     initial_date timestamp not null,
     conclusion_date timestamp,
-    foreign key (sessionID) references backup_session(sessionID)
+    foreign key (session_id) references backup_session(id)
   );

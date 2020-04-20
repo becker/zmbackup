@@ -9,12 +9,12 @@
 # LOADING INSTALL LIBRARIES
 ################################################################################
 echo "Loading installer - PLEASE WAIT"
-source installScript/check.sh
-source installScript/depDownload.sh
-source installScript/deploy.sh
-source installScript/menu.sh
-source installScript/vars.sh
-source installScript/help.sh
+source install/check.sh
+source install/dependencies.sh
+source install/deploy.sh
+source install/menu.sh
+source install/vars.sh
+source install/help.sh
 
 ################################################################################
 # INSTALL MAIN CODE
@@ -25,7 +25,7 @@ source installScript/help.sh
 ################################################################################
 if [[ $1 == "--help" ]] || [[ $1 == "-h" ]]; then
   show_help
-  exit $ERR_OK
+  exit $EXIT_OK
 fi
 
 #
@@ -47,10 +47,10 @@ if [[ $1 == "--remove" ]] || [[ $1 == "-r" ]]; then
     fi
     uninstall
     echo "Uninstall completed. Thanks for using Zmbackup. Have a nice day!"
-    exit $ERR_OK
+    exit $EXIT_OK
   else
     echo "Zmbackup is not installed - nothing to do"
-    exit $ERR_OK
+    exit $EXIT_OK
   fi
 fi
 
@@ -84,4 +84,4 @@ case "$tmp" in
 esac
 
 clear
-exit $ERR_OK
+exit $EXIT_OK

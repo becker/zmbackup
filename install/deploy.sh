@@ -5,7 +5,7 @@
 # blacklist_gen: Generate a blacklist of all accounts Zmbackup should ignore
 ################################################################################
 function blacklist_gen(){
-  for ACCOUNT in $(sudo -H -u $OSE_USER bash -c "/opt/zimbra/bin/zmprov -l gaa"); do
+  for ACCOUNT in $(su - $OSE_USER -c "/opt/zimbra/bin/zmprov -l gaa"); do
     if  [[ "$ACCOUNT" = "galsync"* ]] || \
     [[ "$ACCOUNT" = "virus"* ]] || \
     [[ "$ACCOUNT" = "ham"* ]] || \
@@ -33,7 +33,7 @@ function deploy_new() {
 	echo "Maybe you are using a NFS and the permissions are wrong?"
 	echo "Please check what happened and try again."
 	uninstall
-	exit $ERR_DEPNOTFOUND
+	exit $EXIT_DEPNOTFOUND
   fi
 
   if [[ $SESSION_TYPE == "TXT" ]]; then
@@ -56,9 +56,9 @@ function deploy_new() {
   chown -R zimbra. $OSE_INSTALL_DIR/.parallel
 
   # Copy file
-  install -o $OSE_USER -m 700 $MYDIR/project/zmbackup $ZMBKP_SRC
+  install -o $OSE_USER -m 700 $MYDIR/src/zmbackup $ZMBKP_SRC
   echo -ne '#####                 (25%)\r'
-  cp -R $MYDIR/project/lib/* $ZMBKP_LIB
+  cp -R $MYDIR/src/lib/* $ZMBKP_LIB
   chown -R $OSE_USER. $ZMBKP_LIB
   chmod -R 700 $ZMBKP_LIB
   echo -ne '######                (30%)\r'
@@ -66,11 +66,11 @@ function deploy_new() {
   # Creating httpie config directory
   mkdir $OSE_INSTALL_DIR/.httpie > /dev/null 2>&1 && chown zimbra. $OSE_INSTALL_DIR/.httpie
 
-  install --backup=numbered -o root -m 600 $MYDIR/project/config/zmbackup.cron /etc/cron.d/zmbackup
+  install --backup=numbered -o root -m 600 $MYDIR/src/config/zmbackup.cron /etc/cron.d/zmbackup
   echo -ne '#######               (35%)\r'
-  install --backup=numbered -o $OSE_USER -m 600 $MYDIR/project/config/zmbackup.conf $ZMBKP_CONF
+  install --backup=numbered -o $OSE_USER -m 600 $MYDIR/src/config/zmbackup.conf $ZMBKP_CONF
   echo -ne '########              (40%)\r'
-  install --backup=numbered -o $OSE_USER -m 600 $MYDIR/project/config/blacklist.conf $ZMBKP_CONF
+  install --backup=numbered -o $OSE_USER -m 600 $MYDIR/src/config/blacklist.conf $ZMBKP_CONF
   echo -ne '#########             (45%)\r'
 
   # Including custom settings
@@ -106,14 +106,14 @@ function deploy_new() {
   echo -ne '###################   (95%)\r'
 
   # Creating Zmbackup backup user
-  STATUS=$((sudo -H -u $OSE_USER bash -c "/opt/zimbra/bin/zmprov ca '$ZMBKP_ACCOUNT' '$ZMBKP_PASSWORD' zimbraIsAdminAccount TRUE zimbraAdminAuthTokenLifetime 1") 2>&1)
+  STATUS=$((su - $OSE_USER -c "/opt/zimbra/bin/zmprov ca '$ZMBKP_ACCOUNT' '$ZMBKP_PASSWORD' zimbraIsAdminAccount TRUE zimbraAdminAuthTokenLifetime 1") 2>&1)
   if [[ $? -eq 0 ]]; then
       echo -ne '####################  (100%)\r'
   else
     echo "ERROR - Can't create the user. Executing rollback process"
     echo "Error description: $STATUS"
     uninstall
-    exit $ERR_CREATE_USER
+    exit $EXIT_CREATE_USER
   fi
 }
 
@@ -135,10 +135,10 @@ function deploy_upgrade(){
   mkdir $OSE_INSTALL_DIR/.httpie > /dev/null 2>&1 && chown zimbra. $OSE_INSTALL_DIR/.httpie
 
   # Copy files
-  install -o $OSE_USER -m 700 $MYDIR/project/zmbackup $ZMBKP_SRC
+  install -o $OSE_USER -m 700 $MYDIR/src/zmbackup $ZMBKP_SRC
   echo -ne '###############       (75%)\r'
   test -d $ZMBKP_LIB || mkdir -p $ZMBKP_LIB
-  cp -R $MYDIR/project/lib/* $ZMBKP_LIB
+  cp -R $MYDIR/src/lib/* $ZMBKP_LIB
   chown -R $OSE_USER. $ZMBKP_LIB
   chmod -R 700 $ZMBKP_LIB
   echo -ne '####################  (100%)\r'
@@ -153,14 +153,18 @@ function uninstall() {
   echo -ne '                     (0%)\r'
   rm -rf $ZMBKP_SHARE $ZMBKP_SRC/zmbhousekeep > /dev/null 2>&1
   rm -rf $OSE_INSTALL_DIR/.parallel
-  rm -rf $OSE_INSTALL_DIR/.httpie
   echo -ne '#####                 (25%)\r'
   rm -rf /etc/yum.repos.d/tange.repo
   rm -rf /etc/cron.d/zmbackup
   rm -rf $ZMBKP_LIB $ZMBKP_CONF $ZMBKP_SRC/zmbackup
+  
+  # Remove Zmbackup backup user
+  echo "Removing zmbackup account..."
+  STATUS=$((su - $OSE_USER -c "/opt/zimbra/bin/zmprov da '$ZMBKP_ACCOUNT'") 2>&1)
+
   echo -ne '##########            (50%)\r'
-  if [[ -f $ZMBKP_CONF/blacklist.conf ]]; then
-    install --backup=numbered -o $OSE_USER -m 600 $MYDIR/project/config/blacklist.conf $ZMBKP_CONF
+    if [[ -f $ZMBKP_CONF/blacklist.conf ]]; then
+    install --backup=numbered -o $OSE_USER -m 600 $MYDIR/src/config/blacklist.conf $ZMBKP_CONF
     blacklist_gen
   fi
   echo -ne '###############       (75%)\r'
