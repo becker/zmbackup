@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed PID folder to "/var/run/zmbackup".
 - HTTPie changed to cURL.
 - Minor code changes.
+- Correct identation.
 
 ### Removed
 - Incremental backup options.

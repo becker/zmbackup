@@ -75,126 +75,126 @@ export_function
 export_vars
 constant
 case "$1" in
-  "-f"|"--full" )
+"-f" | "--full")
     checkpid
     case "$2" in
-      "-dl"|"--distributionlist" )
+    "-dl" | "--distributionlist")
         sessionvars $2
         create_temp
         backup_main $DLOBJECT $DLFILTER $3 $4
         rm -rf $PID
-      ;;
-      "-al"|"--alias" )
+        ;;
+    "-al" | "--alias")
         sessionvars $2
         create_temp
         backup_main $ALOBJECT $ALFILTER $3 $4
         rm -rf $PID
-      ;;
-      "-l"|"--ldap" )
+        ;;
+    "-l" | "--ldap")
         sessionvars $2
         create_temp
         backup_main $ACOBJECT $ACFILTER $3 $4
         rm -rf $PID
-      ;;
-      "-m"|"--mailbox" )
+        ;;
+    "-m" | "--mailbox")
         sessionvars $2
         create_temp
         backup_main $ACOBJECT $ACFILTER $3 $4
         rm -rf $PID
-      ;;
-      "-sig"|"--signature" )
+        ;;
+    "-sig" | "--signature")
         sessionvars $2
         create_temp
         backup_main $SIOBJECT $SIFILTER $3 $4
         rm -rf $PID
-      ;;
-      * )
+        ;;
+    *)
         sessionvars $1
         create_temp
         backup_main $ACOBJECT $ACFILTER $2 $3
         rm -rf $PID
-      ;;
+        ;;
     esac
-  ;;
-  "-l"|"--list" )
+    ;;
+"-l" | "--list")
     list_sessions
-  ;;
-  "-r"|"--restore" )
+    ;;
+"-r" | "--restore")
     create_temp
     checkpid
     case "$2" in
-      "-dl"|"--distributionlist"|"-l"|"--ldap"|"-al"|"--alias"|"-sig"|"--signature")
+    "-dl" | "--distributionlist" | "-l" | "--ldap" | "-al" | "--alias" | "-sig" | "--signature")
         restore_main_ldap $3 $4 $5
         rm -rf $PID
-      ;;
-      "-m"|"--mailbox" )
+        ;;
+    "-m" | "--mailbox")
         restore_main_mailbox $3 $4 $5
         rm -rf $PID
-      ;;
-      "-ro"|"--restoreOnAccount" )
+        ;;
+    "-ro" | "--restoreOnAccount")
         if [ -z "$4" ] || [ -z "$5" ]; then
-          show_help
-          printf "\n\nError! Please inform the account that should be restored, and when the restore should be placed.\n\n"
-          exit 2
+            show_help
+            printf "\n\nError! Please inform the account that should be restored, and when the restore should be placed.\n\n"
+            exit 2
         else
-          constant
-          restore_main_mailbox $3 $4 $5
-          rm -rf $PID
+            constant
+            restore_main_mailbox $3 $4 $5
+            rm -rf $PID
         fi
-      ;;
-      * )
+        ;;
+    *)
         if [[ "$2" == "full"* ]]; then
-          constant
-          restore_main_ldap $2 $3 $4
-          restore_main_mailbox $2 $3 $4
-          rm -rf $PID
+            constant
+            restore_main_ldap $2 $3 $4
+            restore_main_mailbox $2 $3 $4
+            rm -rf $PID
         else
-          show_help
-          printf "\n\nError! Invalid parameters for restore\n"
+            show_help
+            printf "\n\nError! Invalid parameters for restore\n"
         fi
-      ;;
+        ;;
     esac
-  ;;
-  "-d"|"--delete" )
+    ;;
+"-d" | "--delete")
     if [ -z "$2" ]; then
-      show_help
-      printf "\n\nError! Please inform the session that should be deleted\n\n"
+        show_help
+        printf "\n\nError! Please inform the session that should be deleted\n\n"
     else
-      checkpid
-      delete_one $2
-      rm -rf $PID
+        checkpid
+        delete_one $2
+        rm -rf $PID
     fi
-  ;;
-  "--housekeep")
+    ;;
+"--housekeep")
     checkpid
     delete_old
     clean_empty
     rm -rf $PID
-  ;;
-  "-t"|"--truncate")
+    ;;
+"-t" | "--truncate")
     if [ ! -z "$2" ] && [ "--force-clean" == "$2" ]; then
-      checkpid
-      leeroy_jenkins
-      clean_empty
-      rm -rf $PID
+        checkpid
+        leeroy_jenkins
+        clean_empty
+        rm -rf $PID
     else
-      echo "This action is irreversible - Use the option --force-clean to override this message"
+        echo "This action is irreversible - Use the option --force-clean to override this message"
     fi
-  ;;
-  "-h"|"--help" )
+    ;;
+"-h" | "--help")
     show_help
-  ;;
-  "-v"|"--version" )
+    ;;
+"-v" | "--version")
     echo "zmbackup version: $VERSION"
-  ;;
-  "-m"|"--migrate" )
+    ;;
+"-m" | "--migrate")
     checkpid
     migration
     rm -rf $PID
-  ;;
-  * )
+    ;;
+*)
     show_help
     printf "\n\nError! Incorrect options\n\n"
-  ;;
+    ;;
 esac
 exit 0
