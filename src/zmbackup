@@ -53,16 +53,16 @@
 ################################################################################
 # LOADING ZMBACKUP LIBRARIES
 ################################################################################
-source /opt/zmbackup/lib/Help.sh
-source /opt/zmbackup/lib/Misc.sh
-source /opt/zmbackup/lib/Notify.sh
-source /opt/zmbackup/lib/Parallel.sh
-source /opt/zmbackup/lib/List.sh
-source /opt/zmbackup/lib/Backup.sh
-source /opt/zmbackup/lib/Restore.sh
-source /opt/zmbackup/lib/Delete.sh
-source /opt/zmbackup/lib/Migration.sh
-source /opt/zmbackup/lib/Session.sh
+source /usr/local/lib/zmbackup/Help.sh
+source /usr/local/lib/zmbackup/Misc.sh
+source /usr/local/lib/zmbackup/Notify.sh
+source /usr/local/lib/zmbackup/Parallel.sh
+source /usr/local/lib/zmbackup/List.sh
+source /usr/local/lib/zmbackup/Backup.sh
+source /usr/local/lib/zmbackup/Restore.sh
+source /usr/local/lib/zmbackup/Delete.sh
+source /usr/local/lib/zmbackup/Migration.sh
+source /usr/local/lib/zmbackup/Session.sh
 
 ################################################################################
 # ZMBACKUP MAIN CODE
